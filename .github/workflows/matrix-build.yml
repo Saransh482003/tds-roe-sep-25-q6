@@ -1,0 +1,43 @@
+name: Multi-Platform Matrix Build (d303f11)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    name: Matrix Build
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]  # 3 parallel variants
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # --- Required Identifier Step ---
+      - name: matrix-d303f11
+        run: echo "Building for Python version ${{ matrix.python-version }}"
+
+      # --- Setup Python environment ---
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # --- Create unique build artifact ---
+      - name: Generate build artifact
+        run: |
+          echo "This is build output for Python ${{ matrix.python-version }}" > build_output.txt
+          echo "Timestamp: $(date)" >> build_output.txt
+          echo "Runner OS: ${{ runner.os }}" >> build_output.txt
+
+      # --- Upload the artifact ---
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-d303f11-py${{ matrix.python-version }}
+          path: build_output.txt
